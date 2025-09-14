@@ -1,5 +1,5 @@
-# Use PHP 8.3 CLI with Node.js
-FROM php:8.3-cli
+# Use Node.js 18 as base and install PHP
+FROM node:18-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -12,15 +12,17 @@ RUN apt-get update && apt-get install -y \
     unzip \
     sqlite3 \
     libsqlite3-dev \
-    nodejs \
-    npm \
-    supervisor
+    supervisor \
+    software-properties-common
+
+# Install PHP 8.3
+RUN curl -fsSL https://packages.sury.org/php/apt.gpg | apt-key add - \
+    && echo "deb https://packages.sury.org/php/ bullseye main" | tee /etc/apt/sources.list.d/php.list \
+    && apt-get update \
+    && apt-get install -y php8.3-cli php8.3-mbstring php8.3-xml php8.3-zip php8.3-sqlite3 php8.3-gd
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
