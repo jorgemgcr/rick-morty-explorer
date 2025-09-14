@@ -1,20 +1,23 @@
 <?php
+// Simple test file to verify PHP is working
+echo "PHP is working!<br>";
+echo "PHP Version: " . phpversion() . "<br>";
+echo "Current directory: " . getcwd() . "<br>";
+echo "Laravel exists: " . (file_exists('artisan') ? 'Yes' : 'No') . "<br>";
 
-use Illuminate\Foundation\Application;
-use Illuminate\Http\Request;
-
-define('LARAVEL_START', microtime(true));
-
-// Determine if the application is in maintenance mode...
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
-    require $maintenance;
+// Test database connection
+try {
+    $pdo = new PDO('sqlite:/var/www/html/database/database.sqlite');
+    echo "Database connection: OK<br>";
+} catch (Exception $e) {
+    echo "Database error: " . $e->getMessage() . "<br>";
 }
 
-// Register the Composer autoloader...
-require __DIR__.'/../vendor/autoload.php';
-
-// Bootstrap Laravel and handle the request...
-/** @var Application $app */
-$app = require_once __DIR__.'/../bootstrap/app.php';
-
-$app->handleRequest(Request::capture());
+// Test Laravel bootstrap
+try {
+    require_once 'bootstrap/app.php';
+    echo "Laravel bootstrap: OK<br>";
+} catch (Exception $e) {
+    echo "Laravel error: " . $e->getMessage() . "<br>";
+}
+?>

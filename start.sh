@@ -26,5 +26,8 @@ php artisan view:clear
 # Run migrations
 php artisan migrate --force
 
-# Start the application
+# Enable debug mode temporarily
+export APP_DEBUG=true
+
+# Start the application with detailed error reporting
 php artisan serve --host 0.0.0.0 --port 10000
