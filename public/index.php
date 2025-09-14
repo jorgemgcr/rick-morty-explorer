@@ -1,54 +1,55 @@
 <?php
-// Simple test file to verify PHP is working
-echo "PHP is working!<br>";
-echo "PHP Version: " . phpversion() . "<br>";
-echo "Current directory: " . getcwd() . "<br>";
 
-// Check if we're in the right directory
-echo "Parent directory: " . dirname(getcwd()) . "<br>";
-echo "Laravel artisan exists: " . (file_exists('../artisan') ? 'Yes' : 'No') . "<br>";
-echo "Laravel bootstrap exists: " . (file_exists('../bootstrap/app.php') ? 'Yes' : 'No') . "<br>";
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Http\Request;
 
-// Check Composer installation
-echo "Composer vendor exists: " . (file_exists('../vendor') ? 'Yes' : 'No') . "<br>";
-echo "Composer autoload exists: " . (file_exists('../vendor/autoload.php') ? 'Yes' : 'No') . "<br>";
+define('LARAVEL_START', microtime(true));
 
-// Check Laravel version
-echo "Laravel version: " . (file_exists('../vendor/laravel/framework') ? 'Installed' : 'Not installed') . "<br>";
+/*
+|--------------------------------------------------------------------------
+| Check If The Application Is Under Maintenance
+|--------------------------------------------------------------------------
+|
+| If the application is in maintenance / demo mode via the "down" command
+| we will load this file so that any pre-rendered content can be shown
+| instead of starting the framework, which could cause an exception.
+|
+*/
 
-// Check if Laravel classes are available
-echo "Laravel Application class exists: " . (class_exists('Illuminate\Foundation\Application') ? 'Yes' : 'No') . "<br>";
-
-// Test Composer autoload
-try {
-    require_once '../vendor/autoload.php';
-    echo "Composer autoload: OK<br>";
-    
-    // Check if Laravel classes are available after autoload
-    echo "Laravel Application class exists (after autoload): " . (class_exists('Illuminate\Foundation\Application') ? 'Yes' : 'No') . "<br>";
-    
-    // Check Laravel version
-    if (class_exists('Illuminate\Foundation\Application')) {
-        echo "Laravel version: " . Illuminate\Foundation\Application::VERSION . "<br>";
-    }
-    
-} catch (Exception $e) {
-    echo "Composer error: " . $e->getMessage() . "<br>";
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
 }
 
-// Test database connection
-try {
-    $pdo = new PDO('sqlite:/app/database/database.sqlite');
-    echo "Database connection: OK<br>";
-} catch (Exception $e) {
-    echo "Database error: " . $e->getMessage() . "<br>";
-}
+/*
+|--------------------------------------------------------------------------
+| Register The Auto Loader
+|--------------------------------------------------------------------------
+|
+| Composer provides a convenient, automatically generated class loader for
+| this application. We just need to utilize it! We'll simply require it
+| into the script here so we don't need to manually load our classes.
+|
+*/
 
-// Test Laravel bootstrap
-try {
-    require_once '../bootstrap/app.php';
-    echo "Laravel bootstrap: OK<br>";
-} catch (Exception $e) {
-    echo "Laravel error: " . $e->getMessage() . "<br>";
-}
-?>
+require __DIR__.'/../vendor/autoload.php';
+
+/*
+|--------------------------------------------------------------------------
+| Run The Application
+|--------------------------------------------------------------------------
+|
+| Once we have the application, we can handle the incoming request using
+| the application's HTTP kernel. Then, we will send the response back
+| to this client's browser, allowing them to enjoy our application.
+|
+*/
+
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
+$kernel = $app->make(Kernel::class);
+
+$response = $kernel->handle(
+    $request = Request::capture()
+)->send();
+
+$kernel->terminate($request, $response);
