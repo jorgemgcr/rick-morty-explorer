@@ -1,5 +1,5 @@
-# Use PHP 8.3 with Apache
-FROM php:8.3-apache
+# Use PHP 8.3 CLI
+FROM php:8.3-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -39,16 +39,8 @@ RUN chmod -R 755 /var/www/html
 RUN mkdir -p /var/www/html/database
 RUN touch /var/www/html/database/database.sqlite
 
-# Set Apache document root
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
-
 # Expose port
-EXPOSE 80
+EXPOSE 10000
 
-# Start Apache
-CMD ["apache2-foreground"]
+# Start PHP built-in server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]

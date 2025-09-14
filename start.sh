@@ -9,10 +9,19 @@ if [ ! -f /var/www/html/database/database.sqlite ]; then
     chmod 664 /var/www/html/database/database.sqlite
 fi
 
+# Set storage permissions
+chmod -R 775 /var/www/html/storage
+chmod -R 775 /var/www/html/bootstrap/cache
+
 # Generate application key if not exists
 if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
+
+# Clear cache
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
 
 # Run migrations
 php artisan migrate --force
