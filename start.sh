@@ -1,17 +1,17 @@
 #!/bin/bash
 
 # Create database directory if it doesn't exist
-mkdir -p /var/www/html/database
+mkdir -p /app/database
 
 # Create database file if it doesn't exist
-if [ ! -f /var/www/html/database/database.sqlite ]; then
-    touch /var/www/html/database/database.sqlite
-    chmod 664 /var/www/html/database/database.sqlite
+if [ ! -f /app/database/database.sqlite ]; then
+    touch /app/database/database.sqlite
+    chmod 664 /app/database/database.sqlite
 fi
 
 # Set storage permissions
-chmod -R 775 /var/www/html/storage
-chmod -R 775 /var/www/html/bootstrap/cache
+chmod -R 775 /app/storage
+chmod -R 775 /app/bootstrap/cache
 
 # Generate application key if not exists
 if [ -z "$APP_KEY" ]; then

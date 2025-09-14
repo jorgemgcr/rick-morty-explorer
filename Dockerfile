@@ -23,7 +23,7 @@ RUN docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
-WORKDIR /var/www/html
+WORKDIR /app
 
 # Copy application files
 COPY . .
@@ -32,12 +32,12 @@ COPY . .
 RUN composer install --optimize-autoloader --no-dev
 
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 755 /var/www/html
+RUN chown -R www-data:www-data /app
+RUN chmod -R 755 /app
 
 # Create database directory
-RUN mkdir -p /var/www/html/database
-RUN touch /var/www/html/database/database.sqlite
+RUN mkdir -p /app/database
+RUN touch /app/database/database.sqlite
 
 # Expose port
 EXPOSE 10000
