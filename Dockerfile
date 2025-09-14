@@ -35,12 +35,11 @@ RUN composer install --optimize-autoloader --no-dev
 RUN chown -R www-data:www-data /app
 RUN chmod -R 755 /app
 
-# Create database directory
-RUN mkdir -p /app/database
-RUN touch /app/database/database.sqlite
+# Make start.sh executable
+RUN chmod +x /app/start.sh
 
 # Expose port
 EXPOSE 10000
 
-# Start PHP built-in server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
+# Start the application using the start.sh script
+CMD ["/app/start.sh"]
