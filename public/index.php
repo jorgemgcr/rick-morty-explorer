@@ -46,6 +46,12 @@ require __DIR__.'/../vendor/autoload.php';
 
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
+// Debug database path
+echo "Database path: " . database_path('database.sqlite') . "<br>";
+echo "Database exists: " . (file_exists(database_path('database.sqlite')) ? 'Yes' : 'No') . "<br>";
+echo "App path: " . app_path() . "<br>";
+echo "Base path: " . base_path() . "<br>";
+
 $kernel = $app->make(Kernel::class);
 
 $response = $kernel->handle(
