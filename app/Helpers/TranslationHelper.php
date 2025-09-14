@@ -7,12 +7,14 @@ class TranslationHelper
     private static $translations = [];
     private static $currentLanguage = 'es';
     
+    // Funcion para inicializar las traducciones
     public static function init()
     {
         self::$currentLanguage = session('locale', 'es');
         self::loadTranslations();
     }
     
+    // Funcion para cambiar el idioma
     public static function setLanguage($language)
     {
         self::$currentLanguage = $language;
@@ -20,6 +22,7 @@ class TranslationHelper
         self::loadTranslations();
     }
     
+    // Funcion para obtener el idioma
     public static function getLanguage()
     {
         if (session()->has('locale')) {
@@ -28,6 +31,7 @@ class TranslationHelper
         return self::$currentLanguage;
     }
     
+    // Funcion para obtener la traduccion
     public static function t($key, $default = null)
     {
         if (empty(self::$translations)) {
@@ -37,6 +41,7 @@ class TranslationHelper
         return self::$translations[$key] ?? $default ?? $key;
     }
     
+    // Funcion para cargar las traducciones
     private static function loadTranslations()
     {
         $language = self::$currentLanguage;
@@ -50,7 +55,7 @@ class TranslationHelper
     }
 }
 
-// Global helper function
+// Funcion global para obtener la traduccion
 if (!function_exists('t')) {
     function t($key, $default = null)
     {

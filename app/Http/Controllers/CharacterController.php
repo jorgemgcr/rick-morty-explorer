@@ -10,9 +10,8 @@ use Illuminate\Support\Facades\Log;
 
 class CharacterController extends Controller
 {
-    /**
-     * Fetch characters from Rick & Morty API and save to database
-     */
+    
+    // Funcion para obtener los personajes de la API
     public function fetch(): JsonResponse
     {
         try {
@@ -30,7 +29,7 @@ class CharacterController extends Controller
             $savedCount = 0;
 
             foreach ($characters as $characterData) {
-                // Check if character already exists
+                // Verificar si el personaje ya existe
                 $existingCharacter = Character::where('url', $characterData['url'])->first();
                 
                 if (!$existingCharacter) {
@@ -70,14 +69,12 @@ class CharacterController extends Controller
         }
     }
 
-    /**
-     * List characters with pagination and search
-     */
+    // Funcion para obtener los personajes de la base de datos
     public function index(Request $request): JsonResponse
     {
         $query = Character::query();
 
-        // Search functionality
+        // Funcion de busqueda
         if ($request->has('search') && !empty($request->search)) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
@@ -88,17 +85,17 @@ class CharacterController extends Controller
             });
         }
 
-        // Filter by status
+        // Filtro por status
         if ($request->has('status') && !empty($request->status)) {
             $query->where('status', $request->status);
         }
 
-        // Filter by species
+        // Filtro por especie
         if ($request->has('species') && !empty($request->species)) {
             $query->where('species', $request->species);
         }
 
-        // Pagination
+        // Paginacion
         $perPage = $request->get('per_page', 15);
         $characters = $query->paginate($perPage);
 
@@ -116,9 +113,7 @@ class CharacterController extends Controller
         ]);
     }
 
-    /**
-     * Show character details
-     */
+    // funcion para obtener los detalles de un personaje
     public function show($id): JsonResponse
     {
         try {

@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>{{ \App\Helpers\TranslationHelper::t('title') }} Explorer</title>
-    <!-- Always load Tailwind CDN for now -->
+    <!-- Cargar Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,10 +22,17 @@
         }
     </script>
     
-    <!-- Try Vite if available -->
-    @if(file_exists(public_path('build/manifest.json')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @endif
+    <!-- Custom CSS para estilos adicionales -->
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-8px) scale(1.02); }
+        .skeleton { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .toast { transform: translateX(100%); transition: transform 0.3s ease-in-out; }
+        .toast.show { transform: translateX(0); }
+        .modal-backdrop { backdrop-filter: blur(8px); }
+    </style>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -36,7 +46,7 @@
         .toast.show { transform: translateX(0); }
         .modal-backdrop { backdrop-filter: blur(8px); }
         
-        /* Language Selector Styles */
+        /* Estilos para el selector de idioma */
         .language-selector {
             position: relative;
         }
@@ -91,7 +101,7 @@
                     <i class="fas fa-globe mr-2"></i>
                     <span>{{ \App\Helpers\TranslationHelper::t('multiverse') }}</span>
                 </div>
-                <!-- Language Selector -->
+                <!-- Selector de idioma -->
                 <div class="relative group language-selector">
                     <div class="flex items-center space-x-2 bg-white/10 backdrop-blur-lg border border-white/30 rounded-xl px-4 py-2 hover:bg-white/20 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105">
                         <i class="fas fa-language text-blue-400"></i>
@@ -99,7 +109,7 @@
                         <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300 group-hover:rotate-180"></i>
                     </div>
                     
-                    <!-- Dropdown Menu -->
+                    <!-- Menu desplegable -->
                     <div id="languageDropdown" class="absolute top-full right-0 mt-2 w-48 language-dropdown bg-white/10 backdrop-blur-lg border border-white/30 rounded-xl shadow-2xl opacity-0 invisible transform translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 z-50">
                         <div class="py-2">
                             <button 
@@ -137,10 +147,10 @@
             </div>
         </div>
 
-        <!-- Search and Filters -->
+        <!-- Busqueda y filtros -->
         <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 mb-12 border border-white/20">
             <div class="flex flex-col lg:flex-row gap-6">
-                <!-- Search Input -->
+                <!-- Input de busqueda -->
                 <div class="flex-1 relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fas fa-search text-gray-400"></i>
@@ -153,7 +163,7 @@
                     >
                 </div>
                 
-                <!-- Status Filter -->
+                <!-- Filtro de estado -->
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fas fa-heartbeat text-gray-400"></i>
@@ -169,7 +179,7 @@
                     </div>
                 </div>
                 
-                <!-- Species Filter -->
+                <!-- Filtro de especie -->
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fas fa-dna text-gray-400"></i>
@@ -183,7 +193,7 @@
                     </div>
                 </div>
                 
-                <!-- Fetch Button -->
+                <!-- Boton de fetch -->
                 <button 
                     id="fetchButton" 
                     class="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 focus:ring-2 focus:ring-blue-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
@@ -194,7 +204,7 @@
             </div>
         </div>
 
-        <!-- Loading Spinner -->
+        <!-- Spinner de carga -->
         <div id="loadingSpinner" class="hidden text-center py-12">
             <div class="inline-flex flex-col items-center space-y-4">
                 <div class="relative">
@@ -212,22 +222,22 @@
             </div>
         </div>
 
-        <!-- Skeleton Loading -->
+        <!-- Skeleton de carga -->
         <div id="skeletonLoading" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
             <!-- Skeleton cards will be generated here -->
         </div>
 
-        <!-- Characters Grid -->
+        <!-- Grid de personajes -->
         <div id="charactersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
             <!-- Characters will be loaded here -->
         </div>
 
-        <!-- Pagination -->
+        <!-- Paginacion -->
         <div id="pagination" class="flex justify-center items-center space-x-4 mb-8">
             <!-- Pagination buttons will be loaded here -->
         </div>
 
-        <!-- Error Message -->
+            <!-- Mensaje de error -->
         <div id="errorMessage" class="hidden bg-red-500/20 backdrop-blur-lg border border-red-400/50 text-red-200 px-6 py-4 rounded-xl mb-4">
             <div class="flex items-center">
                 <i class="fas fa-exclamation-triangle mr-3"></i>
@@ -235,12 +245,12 @@
             </div>
         </div>
 
-        <!-- Toast Container -->
+        <!-- Contenedor de toast -->
         <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2">
             <!-- Toast notifications will appear here -->
         </div>
 
-        <!-- Character Detail Modal -->
+        <!-- Modal de detalle de personaje -->
         <div id="characterModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -312,7 +322,7 @@
         let currentLanguage = '{{ \App\Helpers\TranslationHelper::getLanguage() }}';
         let translations = {};
         
-        // Load translations from server
+        // Cargar traducciones desde el servidor
         async function loadTranslations() {
             try {
                 const response = await fetch('/language/translations');
@@ -335,13 +345,13 @@
             }
         }
         
-        // Translation function for dynamic values
+        // Funcion de traduccion para valores dinamicos
         function translateValue(value) {
             if (!value) return value;
             return translations[value] || value;
         }
         
-        // Translations will be loaded in DOMContentLoaded event
+        // Las traducciones se cargaran en el evento DOMContentLoaded
 
         // DOM Elements
         const searchInput = document.getElementById('searchInput');
@@ -366,7 +376,7 @@
         speciesFilter.addEventListener('change', handleFilter);
         fetchButton.addEventListener('click', handleFetch);
         
-        // Language selector (no longer needed as we use onclick buttons)
+        // Selector de idioma (ya no es necesario ya que usamos botones onclick)
         
         // Modal event listeners
         closeModal.addEventListener('click', (e) => {
@@ -381,14 +391,14 @@
             closeCharacterModal();
         });
         
-        // Close modal when clicking outside
+        // Cerrar modal cuando se hace clic fuera
         characterModal.addEventListener('click', (e) => {
             if (e.target === characterModal) {
                 closeCharacterModal();
             }
         });
         
-        // Prevent modal content clicks from closing modal
+        // Prevenir que el contenido del modal cierre el modal
         const modalContent = characterModal.querySelector('.relative');
         if (modalContent) {
             modalContent.addEventListener('click', (e) => {
@@ -396,7 +406,7 @@
             });
         }
 
-        // Debounce function
+        // Funcion debounce
         function debounce(func, wait) {
             let timeout;
             return function executedFunction(...args) {
@@ -409,14 +419,14 @@
             };
         }
 
-        // Handle search
+        // Manejar busqueda
         function handleSearch() {
             currentSearch = searchInput.value;
             currentPage = 1;
             loadCharacters();
         }
 
-        // Handle filters
+        // Manejar filtros
         function handleFilter() {
             currentStatus = statusFilter.value;
             currentSpecies = speciesFilter.value;
@@ -424,7 +434,7 @@
             loadCharacters();
         }
 
-        // Handle fetch
+        // Manejar fetch
         async function handleFetch() {
             try {
                 showLoading();
@@ -448,7 +458,7 @@
             }
         }
 
-        // Load characters
+        // Cargar personajes
         async function loadCharacters() {
             try {
                 showSkeletonLoading();
@@ -485,7 +495,7 @@
             }
         }
 
-        // Load species for filter
+        // Cargar especies para el filtro
         async function loadSpecies() {
             try {
                 const response = await fetch('/characters/api?per_page=1000'); // Get all characters to extract species
@@ -500,20 +510,20 @@
             }
         }
 
-        // Populate species filter
+        // Llenar el filtro de especies
         function populateSpeciesFilter(species) {
             const speciesFilter = document.getElementById('speciesFilter');
             
-            // Clear existing options except "All species"
+            // Limpiar las opciones existentes excepto "Todas las especies"
             speciesFilter.innerHTML = '<option value="" class="bg-gray-800 text-white">{{ \App\Helpers\TranslationHelper::t('all_species') }}</option>';
             
-            // Add species options
+            // Agregar opciones de especies
             species.forEach(specie => {
                 const option = document.createElement('option');
                 option.value = specie;
                 option.className = 'bg-gray-800 text-white';
                 
-                // Add emoji based on species
+                // Agregar emoji basado en la especie
                 let emoji = '🧬'; // Default
                 if (specie.toLowerCase().includes('human')) emoji = '👤';
                 else if (specie.toLowerCase().includes('alien')) emoji = '👽';
@@ -523,7 +533,7 @@
             });
         }
 
-        // Display characters
+        // Mostrar personajes
         function displayCharacters(characters) {
             charactersGrid.innerHTML = characters.map(character => `
                 <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden card-hover border border-white/20 group">
@@ -601,7 +611,7 @@
             `).join('');
         }
 
-        // Display pagination
+        // Mostrar paginacion
         function displayPagination(paginationData) {
             const { current_page, last_page, total } = paginationData;
             
@@ -612,7 +622,7 @@
 
             let paginationHTML = '';
             
-            // Previous button
+            // Boton anterior
             if (current_page > 1) {
                 paginationHTML += `
                     <button 
@@ -625,7 +635,7 @@
                 `;
             }
 
-            // Page numbers
+            // Numeros de pagina
             const startPage = Math.max(1, current_page - 2);
             const endPage = Math.min(last_page, current_page + 2);
 
@@ -644,7 +654,7 @@
                 `;
             }
 
-            // Next button
+            // Boton siguiente
             if (current_page < last_page) {
                 paginationHTML += `
                     <button 
@@ -671,13 +681,13 @@
             `;
         }
 
-        // Change page
+        // Cambiar pagina
         function changePage(page) {
             currentPage = page;
             loadCharacters();
         }
 
-        // View character details
+        // Ver detalles de personaje
         function viewCharacter(id) {
             console.log('Fetching character with ID:', id); // Debug log
             
@@ -702,17 +712,17 @@
                 });
         }
 
-        // Show character modal
+            // Mostrar modal de personaje
         function showCharacterModal(character) {
             console.log('Character data:', character); // Debug log
             
-            // Update modal content
+            // Actualizar el contenido del modal
             document.getElementById('modalCharacterName').textContent = character.name || '{{ \App\Helpers\TranslationHelper::t('no_name_available') }}';
             const modalImage = document.getElementById('modalCharacterImage');
             modalImage.src = character.image_url || 'https://via.placeholder.com/200x200?text=No+Image';
             modalImage.alt = character.name || 'Personaje';
             
-            // Apply grayscale filter for dead characters
+            // Aplicar filtro de escala de grises para personajes muertos
             if (character.status === 'Dead') {
                 modalImage.classList.add('grayscale');
             } else {
@@ -726,16 +736,16 @@
             document.getElementById('modalCharacterOrigin').textContent = translateValue(character.origin_name) || '{{ \App\Helpers\TranslationHelper::t('unknown_field') }}';
             document.getElementById('modalCharacterLocation').textContent = translateValue(character.location_name) || '{{ \App\Helpers\TranslationHelper::t('unknown_field') }}';
             
-            // Show modal with proper styling
+            // Mostrar modal con estilos adecuados
             characterModal.classList.remove('hidden');
             characterModal.style.display = 'block';
             characterModal.style.pointerEvents = 'auto';
             document.body.style.overflow = 'hidden';
             
-            // Force a reflow to ensure the modal is visible
+            // Forzar un reflow para asegurar que el modal es visible
             characterModal.offsetHeight;
             
-            // Add event listeners after modal is shown
+            // Agregar event listeners despues de mostrar el modal
             setTimeout(() => {
                 const modalContent = characterModal.querySelector('.relative');
                 if (modalContent) {
@@ -746,35 +756,37 @@
             }, 100);
         }
 
-        // Close character modal
+        // Cerrar modal de personaje
         function closeCharacterModal() {
             characterModal.classList.add('hidden');
             characterModal.style.display = 'none';
             document.body.style.overflow = 'auto';
         }
 
-        // Show/hide loading
+        // Mostrar/ocultar loading
         function showLoading() {
             loadingSpinner.classList.remove('hidden');
             charactersGrid.innerHTML = '';
         }
 
+        // Ocultar loading
         function hideLoading() {
             loadingSpinner.classList.add('hidden');
         }
 
-        // Show/hide skeleton loading
+        // Mostrar/ocultar skeleton loading
         function showSkeletonLoading() {
             skeletonLoading.classList.remove('hidden');
             charactersGrid.innerHTML = '';
             generateSkeletonCards();
         }
 
+        // Ocultar skeleton loading
         function hideSkeletonLoading() {
             skeletonLoading.classList.add('hidden');
         }
 
-        // Generate skeleton cards
+        // Generar skeleton cards
         function generateSkeletonCards() {
             const skeletonCards = Array(12).fill().map(() => `
                 <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-white/20">
@@ -793,17 +805,18 @@
             skeletonLoading.innerHTML = skeletonCards;
         }
 
-        // Show/hide error
+        // Mostrar/ocultar error
         function showError(message) {
             errorText.textContent = message;
             errorMessage.classList.remove('hidden');
         }
 
+        // Ocultar error
         function hideError() {
             errorMessage.classList.add('hidden');
         }
 
-        // Show toast notification
+        // Mostrar toast notification
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
             const bgColor = type === 'success' ? 'bg-green-500' : 
@@ -826,32 +839,32 @@
             
             toastContainer.appendChild(toast);
             
-            // Show toast
+                // Mostrar toast
             setTimeout(() => toast.classList.add('show'), 100);
             
-            // Auto remove after 5 seconds
+            // remover despues de 5 segundos
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => toast.remove(), 300);
             }, 5000);
         }
 
-        // Update total characters count
+        // Actualizar el total de personajes
         function updateTotalCharacters(total) {
             totalCharacters.textContent = total;
         }
 
-        // Show success message (legacy)
+        // Mostrar mensaje de exito (legacy)
         function showMessage(message, type) {
             showToast(message, type);
         }
 
-        // Handle language change
+        // Manejar cambio de idioma
         async function changeLanguage(language) {
             try {
                 console.log('Changing language to:', language);
                 
-                // Show loading state
+                // Mostrar estado de loading
                 const languageDropdown = document.getElementById('languageDropdown');
                 if (languageDropdown) {
                     languageDropdown.style.opacity = '0.5';
@@ -872,10 +885,10 @@
                 console.log('Response data:', data);
                 
                 if (data.success) {
-                    // Show success message
+                    // Mostrar mensaje de exito
                     showToast('Idioma cambiado exitosamente / Language changed successfully', 'success');
                     
-                    // Reload page after a short delay
+                    // Recargar pagina despues de un breve delay
                     setTimeout(() => {
                         window.location.reload();
                     }, 500);
@@ -886,7 +899,7 @@
                 console.error('Error changing language:', error);
                 showToast('Error al cambiar idioma / Error changing language', 'error');
             } finally {
-                // Reset dropdown state
+                // Resetear estado del dropdown
                 if (languageDropdown) {
                     languageDropdown.style.opacity = '1';
                     languageDropdown.style.pointerEvents = 'auto';
@@ -894,16 +907,16 @@
             }
         }
 
-        // Load characters on page load
+        // Cargar personajes en el load de la pagina
         document.addEventListener('DOMContentLoaded', () => {
             // Load translations first, then characters
             loadTranslations().then(() => {
                 loadCharacters();
-                loadSpecies(); // Load species for filter
+                loadSpecies(); // Cargar especies para el filtro
             });
         });
         
-        // Close modal with ESC key
+        // Cerrar modal con la tecla ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !characterModal.classList.contains('hidden')) {
                 closeCharacterModal();

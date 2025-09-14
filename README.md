@@ -2,6 +2,12 @@
 
 Una aplicación web moderna desarrollada en Laravel que permite explorar el universo de Rick & Morty con un sistema completo de búsqueda, filtros, paginación e internacionalización.
 
+## 🌐 Demo en Vivo
+
+**🔗 [Ver aplicación desplegada](https://rick-morty-explorer.onrender.com/characters)**
+
+La aplicación está desplegada en Render y lista para usar. ¡Explora el multiverso de Rick & Morty ahora mismo!
+
 ## ✨ Características
 
 - 🌍 **Bilingüe**: Soporte completo para Español e Inglés
@@ -35,7 +41,7 @@ Una aplicación web moderna desarrollada en Laravel que permite explorar el univ
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/jorgemgcr/rick-morty-explorer.git
 cd prueba-tecnica
 ```
 
@@ -67,7 +73,7 @@ APP_DEBUG=true
 APP_URL=http://localhost:8000
 
 DB_CONNECTION=sqlite
-DB_DATABASE=C:\laragon\www\prueba-tecnica\database\database.sqlite
+DB_DATABASE=database/database.sqlite
 ```
 
 ### 5. Generar clave de aplicación
@@ -236,10 +242,6 @@ Para agregar nuevas traducciones:
 # Ejecutar tests
 php artisan test
 
-# Ejecutar tests con coverage
-php artisan test --coverage
-```
-
 ## 📁 Estructura del Proyecto
 
 ```
@@ -294,6 +296,31 @@ composer dump-autoload
 php artisan config:clear
 php artisan cache:clear
 ```
+
+## 🚀 Deployment
+
+### Aplicación en Producción
+
+La aplicación está desplegada en **Render** y disponible en:
+
+**🔗 [https://rick-morty-explorer.onrender.com/characters](https://rick-morty-explorer.onrender.com/characters)**
+
+### Características del Deploy
+
+- ✅ **HTTPS habilitado** para seguridad
+- ✅ **Docker containerizado** para consistencia
+- ✅ **Base de datos SQLite** persistente
+- ✅ **Assets compilados** automáticamente
+- ✅ **Carga automática** de datos de la API
+- ✅ **Cache optimizado** para mejor performance
+
+### Tecnologías de Deploy
+
+- **Plataforma**: Render
+- **Containerización**: Docker
+- **Base de datos**: SQLite
+- **Servidor web**: PHP built-in server
+- **Assets**: Vite + Tailwind CSS
 
 ## 🤝 Contribuir
 

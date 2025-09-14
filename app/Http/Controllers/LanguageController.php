@@ -7,6 +7,7 @@ use App\Helpers\TranslationHelper;
 
 class LanguageController extends Controller
 {
+    // Funcion para cambiar el idioma
     public function changeLanguage(Request $request)
     {
         $language = $request->input('lang', 'es');
@@ -21,6 +22,7 @@ class LanguageController extends Controller
         ]);
     }
     
+    // Funcion para obtener las traducciones
     public function getTranslations()
     {
         $language = session('locale', 'es');
@@ -29,20 +31,20 @@ class LanguageController extends Controller
         $translations = include resource_path("lang/{$language}/messages.php");
         
         // Filtrar solo las traducciones que necesitamos para JavaScript
-        // (valores dinámicos que vienen de la API de Rick & Morty)
+        // (valores dinamicos que vienen de la API de Rick & Morty)
         $jsKeys = [
-            // Species
+            // Especies
             'Human', 'Alien', 'Humanoid', 'Robot', 'Animal', 'Cronenberg', 
             'Disease', 'Mythological Creature', 'Poopybutthole', 'unknown', 'Unknown',
             'Superhuman (Ghost trains summoner)',
             
-            // Status
+            // Estado
             'Alive', 'Dead',
             
-            // Gender
+            // Genero
             'Male', 'Female', 'Genderless',
             
-            // Locations
+            // Ubicaciones
             'Earth', 'Earth (C-137)', 'Earth (Replacement Dimension)', 
             'Citadel of Ricks', 'Interdimensional Cable', 'Worldender\'s lair'
         ];
