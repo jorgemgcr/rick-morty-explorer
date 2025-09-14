@@ -75,7 +75,7 @@ else
     exit 1
 fi
 
-# Check if Node.js is available
+# Check if Node.js is available and build assets
 if command_exists node && command_exists npm; then
     log "📦 Node.js and npm are available"
     
@@ -92,6 +92,18 @@ if command_exists node && command_exists npm; then
     fi
 else
     log "⚠️ Node.js/npm not available, skipping frontend build"
+fi
+
+# Fetch characters data
+log "📡 Fetching characters data from Rick & Morty API..."
+if php artisan tinker --execute="
+    \$controller = new \App\Http\Controllers\CharacterController();
+    \$response = \$controller->fetch(request());
+    echo 'Fetch result: ' . json_encode(\$response->getData());
+"; then
+    log "✅ Characters data fetched successfully"
+else
+    log "⚠️ Characters data fetch failed, but continuing..."
 fi
 
 # Set environment variables
